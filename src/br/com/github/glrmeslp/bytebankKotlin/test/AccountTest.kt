@@ -1,4 +1,5 @@
 package br.com.github.glrmeslp.bytebankKotlin.test
+import br.com.github.glrmeslp.bytebankKotlin.exceptions.*
 import br.com.github.glrmeslp.bytebankKotlin.models.*
 import org.junit.Assert.*
 import org.junit.Before
@@ -29,26 +30,23 @@ class AccountTest {
     @Test
     fun transfer() {
         account.deposit(100.0)
-
-        assertTrue(account.transfer(accountToTransfer,20.0))
+        account.transfer(accountToTransfer,20.0,"123")
         assertEquals("failure - doubles are not equal",79.9,account.balance,0.00001)
         assertEquals("failure - doubles are not equal",20.0,accountToTransfer.balance,0.00001)
     }
 
-    @Test
+    @Test(expected = InsufficientBalanceException::class)
     fun transferWithValueLessThanBalance() {
         account.deposit(100.0)
-
-        assertFalse(account.transfer(accountToTransfer,101.0))
+        account.transfer(accountToTransfer, 101.0, "123")
         assertEquals("failure - doubles are not equal",100.0,account.balance,0.00001)
         assertEquals("failure - doubles are not equal",0.0,accountToTransfer.balance,0.00001)
     }
 
-    @Test
-    fun transferWithValueEqualThanBalance() {
+    @Test(expected = AuthenticationFailureException::class)
+    fun transferWithWrongPassword() {
         account.deposit(100.1)
-
-        assertTrue(account.transfer(accountToTransfer,100.0))
+        account.transfer(accountToTransfer,100.0,"1234")
         assertEquals("failure - doubles are not equal",0.0,account.balance,0.00001)
         assertEquals("failure - doubles are not equal",100.0,accountToTransfer.balance,0.00001)
     }
